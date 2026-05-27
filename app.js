@@ -240,6 +240,7 @@ async function loginUser(userId) {
   const ok = initSupabase();
   if (ok) {
     await loadFromSupabase();
+    subscribeToRealtime(); // 開啟即時同步監聽
   } else {
     loadLocalState();
   }
@@ -251,9 +252,51 @@ async function loginUser(userId) {
 }
 
 function logoutUser() {
+  // 登出時取消即時同步訂閱，避免殘留 WebSocket 連線
+  if (window._berryeyesRealtimeChannel && supabaseClient) {
+    supabaseClient.removeChannel(window._berryeyesRealtimeChannel);
+    window._berryeyesRealtimeChannel = null;
+  }
   currentUserId = null;
   localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
   goToLoginScreen();
+}
+
+// ============================================================
+// ✦ SUPABASE REALTIME (即時同步)
+// ============================================================
+function subscribeToRealtime() {
+  if (!supabaseClient || !currentUserId) return;
+
+  // 若已有舊的訂閱頻道，先移除再重建（避免重複監聽）
+  if (window._berryeyesRealtimeChannel) {
+    supabaseClient.removeChannel(window._berryeyesRealtimeChannel);
+  }
+
+  const channel = supabaseClient
+    .channel('berryeyes-lenses-sync')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',          // 監聽 INSERT, UPDATE, DELETE 全部事件
+        schema: 'public',
+        table: 'lenses',
+        filter: `user_id=eq.${currentUserId}` // 只監聽屬於自己的資料
+      },
+      async (payload) => {
+        console.log('✦ Supabase Realtime: 偵測到資料變動', payload);
+        // 重新從雲端抓取最新資料並更新所有畫面
+        await loadFromSupabase();
+        updateHomeUI();
+        updateCollectionUI();
+        renderCalendar();
+      }
+    )
+    .subscribe((status) => {
+      console.log('Realtime 連線狀態:', status);
+    });
+
+  window._berryeyesRealtimeChannel = channel;
 }
 
 // ============================================================
