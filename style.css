@@ -1307,4 +1307,39 @@ h2 {
   transform: scale(1.02);
 }
 
+/* ============================================================
+   ✦ MOBILE WEB APP RESPONSIVE SUPPORT (PWA EXPERIENCE)
+   ============================================================ */
+@media (max-width: 480px) {
+  body {
+    padding: 0;
+    margin: 0;
+    background: var(--phone-bg);
+  }
+
+  .phone-frame {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height on modern mobile browsers */
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    animation: none; /* Disable entrance animation to save resource on mobile */
+  }
+
+  .phone-camera {
+    display: none; /* Hide simulated notch, use phone's real safe areas instead */
+  }
+
+  .phone-screen {
+    padding: calc(16px + env(safe-area-inset-top)) 20px calc(80px + env(safe-area-inset-bottom)) 20px;
+  }
+
+  .phone-navbar {
+    height: calc(64px + env(safe-area-inset-bottom));
+    padding: 0 10px env(safe-area-inset-bottom) 10px;
+  }
+}
+
+
 
