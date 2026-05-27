@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✧ BerryEyes ✧ 隱形眼鏡小幫手</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- Minimalist Mobile Simulator Frame -->
+  <div class="phone-frame">
+    <!-- Camera Notch -->
+    <div class="phone-camera"></div>
+
+    <!-- Active App Screen Container -->
+    <div class="phone-screen" id="app-screen">
+
+      <!-- ================= SCREEN: LOGIN (Welcome Screen) ================= -->
+      <section id="screen-login" class="screen">
+        <h1 style="margin-top: 60px;">BerryEyes</h1>
+        <div class="login-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+          <div class="card login-card" style="width: 100%; padding: 24px 20px; text-align: center;">
+            <div style="font-family: var(--font-serif); font-size: 1.25rem; font-style: italic; color: var(--primary-dark); margin-bottom: 8px;">
+              Welcome ✧
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;">
+              請輸入您的專屬暱稱或 ID 開始記錄。<br>紀錄將同步至雲端，換手機也不會遺失唷！
+            </p>
+            
+            <form id="login-form" style="width: 100%; display: flex; flex-direction: column; gap: 12px;">
+              <div class="form-group" style="text-align: left;">
+                <label for="login-username" style="font-size: 0.68rem; font-weight: 600; color: var(--text-muted);">您的專屬暱稱 / ID</label>
+                <input type="text" id="login-username" placeholder="例如：lulu99" required style="text-align: center; font-size: 0.95rem; padding: 10px;">
+              </div>
+              <button type="submit" class="form-submit-btn" style="margin-top: 5px;">開啟配戴記錄 💖</button>
+            </form>
+          </div>
+          
+          <button id="login-open-config-btn" style="background: none; border: none; font-size: 0.72rem; color: var(--text-muted); text-decoration: underline; cursor: pointer; margin-top: 15px;">
+            ⚙️ 設定 Supabase 雲端資料庫
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= SCREEN A: HOME ================= -->
+      <section id="screen-home" class="screen">
+        <!-- User Status Info Bar -->
+        <div class="user-status-bar">
+          <span class="user-name-tag">👤 <span id="current-user-display">lulu</span></span>
+          <div class="user-actions">
+            <button id="home-open-config-btn" class="status-icon-btn" title="資料庫設定">⚙️</button>
+            <button id="logout-user-btn" class="status-text-btn">登出</button>
+          </div>
+        </div>
+        <h1>BerryEyes</h1>
+
+        <div class="home-container">
+          <!-- Heart Progress Card -->
+          <div class="card progress-card">
+            <div class="heart-progress-container">
+              <!-- SVG Heart Progress -->
+              <svg class="heart-progress-svg" viewBox="-5 -5 110 110">
+                <defs>
+                  <linearGradient id="pink-gradient" x1="0" y1="1" x2="0" y2="0">
+                    <stop offset="0%" stop-color="#FF4D6D" />
+                    <stop offset="60%" stop-color="#FF85A1" />
+                    <stop offset="100%" stop-color="#FFB3C6" />
+                  </linearGradient>
+                  <clipPath id="heart-clip">
+                    <path d="M 50,25 C 50,25 38,10 20,10 C 8,10 0,20 0,35 C 0,55 25,75 50,90 C 75,75 100,55 100,35 C 100,20 92,10 80,10 C 62,10 50,25 50,25 Z"/>
+                  </clipPath>
+                </defs>
+                <!-- Background Empty Heart -->
+                <path d="M 50,25 C 50,25 38,10 20,10 C 8,10 0,20 0,35 C 0,55 25,75 50,90 C 75,75 100,55 100,35 C 100,20 92,10 80,10 C 62,10 50,25 50,25 Z" fill="#FFF5F6" />
+                
+                <!-- Filled Heart Progress Clip -->
+                <g clip-path="url(#heart-clip)">
+                  <rect id="progress-fill" x="-10" y="90" width="120" height="100" fill="url(#pink-gradient)" class="progress-fill-rect" />
+                </g>
+
+                <!-- Outline Border of Heart -->
+                <path d="M 50,25 C 50,25 38,10 20,10 C 8,10 0,20 0,35 C 0,55 25,75 50,90 C 75,75 100,55 100,35 C 100,20 92,10 80,10 C 62,10 50,25 50,25 Z" fill="none" stroke="#FFB3C6" stroke-width="2.5" stroke-linejoin="round" />
+              </svg>
+
+              <!-- Progress Text Overlay -->
+              <div class="progress-text-overlay">
+                <span class="progress-number" id="home-progress-percent">0%</span>
+                <span class="progress-label" id="home-progress-status">Remaining</span>
+                <span class="lens-meta-badge" id="active-lens-badge">Candy Pink</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wearing Status Toggle Switch Card -->
+          <div class="card toggle-card">
+            <div class="toggle-info">
+              <span class="toggle-title">今日配戴狀態</span>
+              <span class="toggle-subtitle" id="toggle-status-text">今天尚未戴上隱形眼鏡</span>
+            </div>
+            
+            <label class="heart-switch">
+              <input type="checkbox" id="today-wear-toggle">
+              <span class="heart-switch-track">
+                <span class="heart-switch-thumb">
+                  <svg viewBox="0 0 100 100">
+                    <path d="M 50,25 C 50,25 38,10 20,10 C 8,10 0,20 0,35 C 0,55 25,75 50,90 C 75,75 100,55 100,35 C 100,20 92,10 80,10 C 62,10 50,25 50,25 Z" />
+                  </svg>
+                </span>
+              </span>
+            </label>
+          </div>
+
+          <!-- Quick Stats Row -->
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-num" id="stat-worn-days">0 天</span>
+              <span class="stat-lbl">本月累計配戴</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num" id="stat-left-days">30 天</span>
+              <span class="stat-lbl">月拋剩餘壽命</span>
+            </div>
+          </div>
+
+          <!-- Tip Banner -->
+          <div class="tip-banner">
+            <span class="tip-banner-icon">💡</span>
+            <span class="tip-banner-text">小叮嚀：配戴隱形眼鏡建議不超過 8 小時，拔下後要確實清潔揉搓唷！</span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= SCREEN B: INVENTORY ================= -->
+      <section id="screen-collection" class="screen">
+        <div class="collection-header">
+          <h2>
+            <svg style="width: 20px; height: 20px; fill: var(--primary);" viewBox="0 0 100 100">
+              <path d="M 50,25 C 50,25 38,10 20,10 C 8,10 0,20 0,35 C 0,55 25,75 50,90 C 75,75 100,55 100,35 C 100,20 92,10 80,10 C 62,10 50,25 50,25 Z" />
+            </svg>
+            我的收藏庫
+          </h2>
+          <button class="add-lens-btn" id="open-add-modal-btn">
+            <span>＋</span> 新增款式
+          </button>
+        </div>
+        
+        <!-- Polaroid style list -->
+        <div class="polaroid-grid" id="lens-list-container">
+          <!-- Rendered dynamically -->
+        </div>
+      </section>
+
+      <!-- ================= SCREEN C: CALENDAR ================= -->
+      <section id="screen-calendar" class="screen">
+        <h2>
+          <svg style="width: 20px; height: 20px; fill: var(--primary);" viewBox="0 0 24 24">
+            <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z" />
+          </svg>
+          日曆歷史紀錄
+        </h2>
+
+        <!-- Month Navigation Controls -->
+        <div class="calendar-header-controls">
+          <button class="month-nav-btn" id="calendar-prev-month">&lt;</button>
+          <span class="current-month-display" id="calendar-month-title">MAY 2026</span>
+          <button class="month-nav-btn" id="calendar-next-month">&gt;</button>
+        </div>
+
+        <!-- Custom Calendar Widget -->
+        <div class="calendar-widget">
+          <div class="calendar-weekdays">
+            <span>Su</span>
+            <span>Mo</span>
+            <span>Tu</span>
+            <span>We</span>
+            <span>Th</span>
+            <span>Fr</span>
+            <span>Sa</span>
+          </div>
+          <div class="calendar-days" id="calendar-days-container">
+            <!-- Dynamic dates in Bodoni -->
+          </div>
+        </div>
+
+        <!-- Info/Legend Card -->
+        <div class="card calendar-info-card">
+          <div class="legend-item">
+            <svg class="legend-icon-bow" viewBox="0 0 100 100">
+              <path d="M 50 50 C 35 25, 15 30, 15 50 C 15 70, 35 75, 50 50 Z" />
+              <path d="M 50 50 C 65 25, 85 30, 85 50 C 85 70, 65 75, 50 50 Z" />
+              <circle cx="50" cy="50" r="10" />
+            </svg>
+            <span>配戴日 (小蝴蝶結)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-icon-today"></div>
+            <span>今天</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Lens Color Legend Container -->
+        <div id="calendar-lens-legend-container"></div>
+      </section>
+
+      <!-- ================= SCREEN D: NEWS ================= -->
+      <section id="screen-news" class="screen">
+        <h2>
+          <svg style="width: 20px; height: 20px; fill: var(--primary);" viewBox="0 0 24 24">
+            <path d="M19 3h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.1-.9-2-2-2zm-1 16h-12v-2h12v2zm0-4h-12v-2h12v2zm0-4h-12v-4h12v4z"/>
+          </svg>
+          最新美瞳情報
+        </h2>
+
+        <!-- News Control/Status Bar -->
+        <div class="news-control-bar">
+          <div class="sync-status-info">
+            <span class="sync-indicator-dot"></span>
+            <span id="news-sync-time">資料載入中...</span>
+          </div>
+          <button id="news-sync-btn" class="news-sync-btn">
+            <span>🔄</span> 重新整理
+          </button>
+        </div>
+
+        <!-- Scrollable list of news cards -->
+        <div class="news-list" id="news-list-container">
+          <!-- Dynamic cards populated by JS -->
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ================= SUPABASE CONFIG MODAL ================= -->
+    <div class="modal-overlay" id="supabase-config-modal">
+      <div class="modal-content" style="max-width: 330px;">
+        <button class="close-modal-btn" id="close-config-modal-btn">&times;</button>
+        <div class="form-title">⚙️ Supabase 資料庫設定</div>
+        <p style="font-size: 0.65rem; color: var(--text-muted); text-align: center; margin-bottom: 14px; line-height: 1.4;">
+          貼上您的 Supabase 專屬 URL 與 Anon 金鑰。設定後，隱眼記錄會自動儲存於您的雲端！
+        </p>
+        
+        <form id="supabase-config-form">
+          <div class="form-group">
+            <label for="db-url">Supabase URL</label>
+            <input type="text" id="db-url" placeholder="https://xxxx.supabase.co">
+          </div>
+          
+          <div class="form-group">
+            <label for="db-anon-key">Supabase Anon Key</label>
+            <input type="text" id="db-anon-key" placeholder="eyJhbGciOi...">
+          </div>
+ 
+          <div style="font-size: 0.62rem; color: var(--primary-dark); line-height: 1.35; margin: 8px 0; font-weight: 500; text-align: center;">
+            ⚠️ 留空並儲存將切換為「離線單機模式」（LocalStorage）。
+          </div>
+ 
+          <button type="submit" class="form-submit-btn">儲存資料庫設定</button>
+        </form>
+      </div>
+    </div>
+ 
+    <!-- ================= ADD LENS FORM MODAL ================= -->
+    <div class="modal-overlay" id="add-lens-modal">
+      <div class="modal-content">
+        <button class="close-modal-btn" id="close-modal-btn">&times;</button>
+        <div class="form-title">✧ 新增美瞳款式 ✧</div>
+        
+        <form id="add-lens-form">
+          <div class="form-group">
+            <label for="lens-name">款式名稱</label>
+            <input type="text" id="lens-name" placeholder="例如：莓果粉紅" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="lens-brand">品牌名稱</label>
+            <input type="text" id="lens-brand" placeholder="例如：Pegavision" required>
+          </div>
+ 
+          <div class="form-group">
+            <label for="lens-photo">款式照片</label>
+            <div class="file-upload-wrapper">
+              <span class="file-upload-btn" id="upload-btn-label">📷 選擇照片或拍照</span>
+              <input type="file" id="lens-photo" accept="image/*" multiple>
+            </div>
+          </div>
+ 
+          <button type="submit" class="form-submit-btn">加入我的收藏</button>
+        </form>
+      </div>
+    </div>
+ 
+    <!-- ================= BOTTOM NAVIGATION BAR ================= -->
+    <nav class="phone-navbar">
+      <!-- Home tab -->
+      <a class="nav-tab active-tab" data-target="home">
+        <svg class="nav-tab-icon" viewBox="0 0 24 24">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        </svg>
+        <span class="nav-tab-label">Home</span>
+      </a>
+ 
+      <!-- Collection tab -->
+      <a class="nav-tab" data-target="collection">
+        <svg class="nav-tab-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3.2"/>
+          <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+        </svg>
+        <span class="nav-tab-label">Collection</span>
+      </a>
+ 
+      <!-- Calendar tab -->
+      <a class="nav-tab" data-target="calendar">
+        <svg class="nav-tab-icon" viewBox="0 0 24 24">
+          <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z" />
+        </svg>
+        <span class="nav-tab-label">Calendar</span>
+      </a>
+
+      <!-- News tab -->
+      <a class="nav-tab" data-target="news">
+        <svg class="nav-tab-icon" viewBox="0 0 24 24">
+          <path d="M19 3h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.1-.9-2-2-2zm-1 16h-12v-2h12v2zm0-4h-12v-2h12v2zm0-4h-12v-4h12v4z"/>
+        </svg>
+        <span class="nav-tab-label">News</span>
+      </a>
+
+    </nav>
+  </div>
+
+  <!-- Reusable SVG Bow Stamp Definition -->
+  <div style="display:none;">
+    <svg id="svg-bow-template" viewBox="0 0 100 100">
+      <path d="M 50 50 C 35 25, 15 30, 15 50 C 15 70, 35 75, 50 50 Z" />
+      <path d="M 50 50 C 65 25, 85 30, 85 50 C 85 70, 65 75, 50 50 Z" />
+      <path d="M 45 52 C 40 70, 25 85, 20 90 C 32 85, 45 78, 48 55 Z" />
+      <path d="M 55 52 C 60 70, 75 85, 80 90 C 68 85, 55 78, 52 55 Z" />
+      <circle cx="50" cy="50" r="10" />
+    </svg>
+  </div>
+
+  <!-- Embedded News Data Backup -->
+  <script src="news_data.js"></script>
+  <!-- App logic script -->
+  <script src="app.js"></script>
+</body>
+</html>
