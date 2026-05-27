@@ -907,7 +907,14 @@ function renderNewsUI(newsItems) {
   if (!container) return;
   container.innerHTML = '';
 
-  if (!newsItems || newsItems.length === 0) {
+  // 過濾掉無標題、無副標題、無內文的空白橫幅宣傳框 (例如官網最上方的背景 LOGO Banner)
+  const validItems = (newsItems || []).filter(item => {
+    return (item.title && item.title.trim() !== '') || 
+           (item.subtitle && item.subtitle.trim() !== '') || 
+           (item.content && item.content.trim() !== '');
+  });
+
+  if (validItems.length === 0) {
     container.innerHTML = `
       <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
         <div style="font-size: 2.5rem; margin-bottom: 12px;">📰</div>
@@ -922,7 +929,7 @@ function renderNewsUI(newsItems) {
     return;
   }
 
-  newsItems.forEach(item => {
+  validItems.forEach(item => {
     const card = document.createElement('div');
     card.className = 'news-card';
     
