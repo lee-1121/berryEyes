@@ -264,6 +264,34 @@ function getActiveLens() {
 }
 
 // ============================================================
+// ✦ CONFETTI EFFECTS (Y2K Pastel Colors: #FFD1DC, #FF85A2, #FFFFFF)
+// ============================================================
+function triggerConfetti(element) {
+  try {
+    if (typeof confetti === 'function') {
+      let originX = 0.5;
+      let originY = 0.5;
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        originX = (rect.left + rect.width / 2) / window.innerWidth;
+        originY = (rect.top + rect.height / 2) / window.innerHeight;
+      }
+      confetti({
+        particleCount: 90,
+        spread: 60,
+        colors: ['#FFD1DC', '#FF85A2', '#FFFFFF'],
+        origin: { x: originX, y: originY },
+        ticks: 200,
+        gravity: 1.1,
+        scalar: 1.1
+      });
+    }
+  } catch (err) {
+    console.error('Confetti trigger failed', err);
+  }
+}
+
+// ============================================================
 // ✦ SPARKLE EFFECTS
 // ============================================================
 function burstSparkles(x, y) {
@@ -588,6 +616,9 @@ function renderCalendar() {
         if (!activeLens.activatedDate) {
           activeLens.activatedDate = cellDateStr;
         }
+
+        // Trigger Y2K canvas-confetti sparkle animation centered on the calendar cell
+        triggerConfetti(cell);
       }
 
       updateHomeUI();
@@ -688,6 +719,9 @@ if (todayWearToggle) {
           activeLens.activatedDate = TODAY_DATE;
         }
       }
+
+      // Trigger Y2K canvas-confetti sparkle animation centered on the heart switch
+      triggerConfetti(e.target);
     } else {
       // Remove ONLY today's date from the wearDates array instead of resetting the entire 30 days
       activeLens.wearDates = activeLens.wearDates.filter(d => d !== TODAY_DATE);
