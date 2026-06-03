@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>✧ BerryEyes ✧ 成果與功能操作展示</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Outfit:wght@100..900&family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- canvas-confetti CDN for real particle effects -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* ============================================================
+       ✦ DESIGN SYSTEM & Y2K PALETTE
+       ============================================================ */
+    :root {
+      --primary: #FF85A2;
+      --primary-light: #FFD1DC;
+      --primary-dark: #D64161;
+      --phone-bg: #FFF5F6;
+      --text-main: #5C5254;
+      --text-muted: #A39699;
+      --border-color: #FFE0E6;
+      --shadow-color: rgba(255, 133, 162, 0.15);
+      
+      --font-sans: 'Outfit', 'Noto Sans TC', sans-serif;
+      --font-serif: 'Noto Serif TC', serif;
+      --font-fredoka: 'Fredoka', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      color: var(--text-main);
+      background-image: radial-gradient(circle at 10% 20%, rgba(255, 240, 243, 0.8) 0%, rgba(250, 244, 245, 0.4) 90%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       ✦ HEADER BAR
+       ============================================================ */
+    header {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .header-logo {
+      font-family: var(--font-fredoka);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-logo span {
+      font-family: var(--font-serif);
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: var(--primary-light);
+      padding: 2px 8px;
+      border-radius: 20px;
+      color: var(--primary-dark);
+      border: 1px solid var(--border-color);
+    }
+
+    .back-btn {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      text-decoration: none;
+      background: #FFFFFF;
+      padding: 8px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .back-btn:hover {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* ============================================================
+       ✦ MAIN LAYOUT
+       ============================================================ */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      height: calc(100vh - 69px);
+      min-height: 600px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      body {
+        overflow-y: auto;
+      }
+    }
+
+    /* ============================================================
+       ✦ LEFT DASHBOARD PANEL (Step Information)
+       ============================================================ */
+    .dashboard {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .step-badge {
+      font-family: var(--font-fredoka);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+
+    .step-title {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+
+    .step-description {
+      font-size: 0.92rem;
+      color: var(--text-main);
+      line-height: 1.7;
+      margin-bottom: 24px;
+      flex: 1;
+    }
+
+    .step-description ul {
+      list-style-type: none;
+    }
+
+    .step-description li {
+      margin-bottom: 12px;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .step-description li::before {
+      content: '✦';
+      color: var(--primary);
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    /* AUTO-PLAY & CONTROLS */
+    .controls-container {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 8px 24px var(--shadow-color);
+      margin-bottom: 20px;
+    }
+
+    .autoplay-btn {
+      width: 100%;
+      background: var(--primary-dark);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(214, 65, 97, 0.3);
+      transition: all 0.2s ease;
+      margin-bottom: 12px;
+      font-family: var(--font-sans);
+    }
+
+    .autoplay-btn:hover {
+      background: #FF4D73;
+      transform: translateY(-1px);
+    }
+
+    .autoplay-btn.playing {
+      background: #5C5254;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .navigation-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+
+    .nav-btn:hover {
+      background: var(--primary);
+      color: #FFFFFF;
+      border-color: var(--primary);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: #FFFFFF;
+      color: var(--text-muted);
+    }
+
+    /* DIRECTORY OF STEPS */
+    .step-directory {
+      border-top: 1px dashed var(--border-color);
+      padding-top: 16px;
+    }
+
+    .directory-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .directory-list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .directory-item {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 8px 0;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-fredoka);
+    }
+
+    .directory-item:hover, .directory-item.active {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+
+    /* ============================================================
+       ✦ RIGHT SIDE DISPLAY PANEL (Mock Browser & Phone)
+       ============================================================ */
+    .display-panel {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      position: relative;
+    }
+
+    @media (max-width: 900px) {
+      .display-panel {
+        padding: 24px 16px;
+      }
+    }
+
+    /* Simulated Safari Desktop Window */
+    .mock-browser {
+      background: #FFFFFF;
+      border: 1px solid rgba(255, 194, 209, 0.4);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 600px;
+      height: 780px;
+      box-shadow: 0px 30px 90px rgba(255, 107, 139, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .browser-header {
+      background: #FFF0F2;
+      border-bottom: 1px solid var(--border-color);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .browser-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .browser-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .browser-dot.red { background: #FF5F56; }
+    .browser-dot.yellow { background: #FFBD2E; }
+    .browser-dot.green { background: #27C93F; }
+
+    .browser-address {
+      flex: 1;
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 4px 12px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: center;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .browser-content {
+      flex: 1;
+      background: #FFF5F6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Simulated Phone Viewport */
+    .phone-simulator {
+      position: relative;
+      width: 330px;
+      height: 640px;
+      background: #FFFFFF;
+      border: 8px solid #5C5254;
+      border-radius: 36px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.95);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .phone-simulator.zoomed {
+      transform: scale(1.15) translateY(-20px);
+    }
+
+    /* Native iPhone Notch simulation */
+    .simulator-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 18px;
+      background: #5C5254;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      z-index: 100;
+    }
+
+    .simulator-screen {
+      flex: 1;
+      background: var(--phone-bg);
+      padding: 24px 16px 64px 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .simulator-screen::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Simulated Bottom Navigation */
+    .simulator-navbar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 10px 4px 10px;
+      z-index: 90;
+    }
+
+    .sim-nav-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      font-weight: 600;
+    }
+
+    .sim-nav-tab svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--text-muted);
+      margin-bottom: 2px;
+      transition: all 0.2s;
+    }
+
+    .sim-nav-tab.active {
+      color: var(--primary-dark);
+    }
+
+    .sim-nav-tab.active svg {
+      fill: var(--primary-dark);
+      transform: scale(1.1);
+    }
+
+    /* ============================================================
+       ✦ ANNOTATION OVERLAYS (Visual Pointers)
+       ============================================================ */
+    .overlay-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 120;
+    }
+
+    /* Pulse Target Circle */
+    .pulse-ring {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--primary);
+      border-radius: 50%;
+      background: rgba(255, 133, 162, 0.15);
+      box-shadow: 0 0 10px var(--primary);
+      display: none;
+      animation: pulseEffect 1.2s infinite ease-out;
+      transform: translate(-50%, -50%);
+    }
+
+    @keyframes pulseEffect {
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.8; }
+      100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+    }
+
+    /* Blinking Arrow pointing to targets */
+    .bouncing-arrow {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      display: none;
+      animation: bounceArrow 0.8s infinite alternate ease-in-out;
+      transform: translate(-50%, -100%);
+    }
+
+    @keyframes bounceArrow {
+      0% { transform: translate(-50%, -115%) rotate(0deg); }
+      100% { transform: translate(-50%, -85%) rotate(0deg); }
+    }
+
+    /* Callout bubble explaining specific detail */
+    .bubble-annotation {
+      position: absolute;
+      background: #5C5254;
+      color: #FFFFFF;
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      line-height: 1.4;
+      width: 140px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transform: translate(-50%, -130%) scale(0.9);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: none;
+    }
+
+    .bubble-annotation.active {
+      opacity: 1;
+      transform: translate(-50%, -130%) scale(1);
+    }
+
+    .bubble-annotation::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 6px 6px 0;
+      border-style: solid;
+      border-color: #5C5254 transparent;
+      display: block;
+      width: 0;
+    }
+
+    /* Simulated cursor */
+    .virtual-cursor {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%235C5254' stroke='white' stroke-width='1.5' d='M4.5 3v15.2l3.8-3.8 2.9 6.8 2.2-.9-2.9-6.8 5.3-.3L4.5 3z'/%3E%3C/svg%3E");
+      background-size: contain;
+      pointer-events: none;
+      z-index: 150;
+      display: none;
+      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transform: translate(0, 0);
+    }
+
+    /* Confetti local canvas */
+    #local-confetti-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 110;
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       ✦ COMMON CARD & CONTAINER STYLES (MATCHING BERRYEYES)
+       ============================================================ */
+    .card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 4px 12px var(--shadow-color);
+      margin-bottom: 12px;
+    }
+
+    .brand-tag {
+      font-size: 0.6rem;
+      font-weight: 700;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 2px 8px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 0.85rem;
+      background: var(--phone-bg);
+      outline: none;
+      text-align: center;
+      color: var(--text-main);
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--primary-dark);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ============================================================
+       ✦ SCREENS (SLIDES 1-8 CONTENTS)
+       ============================================================ */
+    .slide-screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+    }
+
+    .slide-screen.active {
+      display: flex;
+    }
+
+    /* Title of Screen */
+    .screen-h1 {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      color: var(--primary-dark);
+      text-align: center;
+      margin-bottom: 12px;
+      font-style: italic;
+    }
+
+    /* Loading Synchronizer Animation */
+    .sync-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 244, 245, 0.9);
+      backdrop-filter: blur(2px);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      animation: fadeSync 2s forwards;
+    }
+    @keyframes fadeSync {
+      0% { opacity: 1; pointer-events: all; }
+      85% { opacity: 1; pointer-events: all; }
+      100% { opacity: 0; pointer-events: none; }
+    }
+
+    /* Simulated Big Heart Button */
+    .heart-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px 0;
+    }
+    .heart-button {
+      width: 100px;
+      height: 100px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.2rem;
+      cursor: pointer;
+      box-shadow: 0px 8px 24px var(--shadow-color);
+      transition: all 0.2s ease;
+    }
+    .heart-button.pulsing {
+      animation: beat 0.4s 2;
+    }
+    @keyframes beat {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Active Wear details card */
+    .wear-progress-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+      border-radius: 16px;
+      background: #FFF5F6;
+      border: 1px dashed var(--border-color);
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* Calendar Grid */
+    .sim-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-top: 8px;
+    }
+    .sim-cal-header {
+      font-weight: 600;
+      font-size: 0.6rem;
+      text-align: center;
+      color: var(--text-muted);
+      padding: 4px 0;
+    }
+    .sim-cal-day {
+      font-size: 0.68rem;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: var(--text-main);
+      position: relative;
+    }
+    .sim-cal-day.empty { color: transparent; }
+    .sim-cal-day.tracked {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: bold;
+    }
+    .sim-cal-day.selected {
+      background: var(--primary-dark) !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 0 6px var(--primary);
+    }
+
+    /* Accordion in News */
+    .sim-news-card {
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      background: #FFFFFF;
+      overflow: hidden;
+      box-shadow: 0 4px 10px var(--shadow-color);
+      margin-bottom: 12px;
+    }
+    .sim-news-img {
+      width: 100%;
+      height: 80px;
+      background-size: cover;
+      background-position: center;
+    }
+    .sim-news-body {
+      padding: 10px;
+    }
+    .sim-news-title {
+      font-family: var(--font-serif);
+      font-size: 0.85rem;
+      color: var(--primary-dark);
+    }
+    .sim-news-desc {
+      font-size: 0.65rem;
+      line-height: 1.5;
+      color: var(--text-main);
+      margin-top: 4px;
+      max-height: 28px;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+      white-space: pre-line;
+    }
+    .sim-news-desc.expanded {
+      max-height: 120px;
+    }
+
+    /* Modal Form Overlay */
+    .sim-modal-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(92, 82, 84, 0.25);
+      backdrop-filter: blur(2px);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+    }
+    .sim-modal-content {
+      background: #FFFFFF;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      width: 100%;
+      padding: 16px;
+      box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+      animation: slideUp 0.3s forwards;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    /* iOS Share Sheet Illustration */
+    .safari-sharesheet {
+      background: #F1F1F1;
+      border-top: 1px solid #CCCCCC;
+      border-radius: 20px 20px 0 0;
+      padding: 16px;
+      font-size: 0.72rem;
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      z-index: 110;
+      display: none;
+      animation: slideUp 0.3s forwards;
+      color: #000000;
+    }
+    .sharesheet-header {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 12px;
+      color: #666666;
+    }
+    .sharesheet-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sharesheet-opt {
+      background: #FFFFFF;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER BAR -->
+  <header>
+    <a href="index.html" class="header-logo">
+      🍓 BerryEyes <span>Showcase ✧</span>
+    </a>
+    <a href="index.html" class="back-btn">
+      ◀ 返回主要程式碼頁面
+    </a>
+  </header>
+
+  <main>
+    <!-- LEFT SIDE: STEPS & AUDIO/VIDEO CONTROLLER -->
+    <section class="dashboard">
+      <div class="step-badge" id="slide-num-badge">Step 01 / 08</div>
+      <h2 class="step-title" id="slide-title-display">登入與雲端同步</h2>
+      
+      <!-- Descriptions with Bullet Points -->
+      <div class="step-description" id="slide-desc-display">
+        <ul>
+          <li>使用者首次開啟網頁，只要輸入專屬的暱稱或個人 ID 即可快速登入。</li>
+          <li>登入時會即時串接 Supabase 雲端資料庫。若之前已有紀錄，程式會自動從雲端完成雙向同步。</li>
+          <li>如果雲端連線失敗或無資料，會自動無縫切換至本地快取（Local Storage）備份，保證在各種環境下都能完美操作。</li>
+        </ul>
+      </div>
+
+      <!-- PLAYBACK CONTROLS -->
+      <div class="controls-container">
+        <button class="autoplay-btn" id="autoplay-trigger">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" id="play-icon">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <span id="autoplay-text">▶️ 開始自動播放介紹</span>
+        </button>
+        
+        <div class="navigation-btns">
+          <button class="nav-btn" id="prev-btn" disabled>上一步 ◀</button>
+          <button class="nav-btn" id="next-btn">下一步 ▶</button>
+        </div>
+      </div>
+
+      <!-- INDEX DIRECTORY -->
+      <div class="step-directory">
+        <div class="directory-title">展示章節目錄</div>
+        <div class="directory-list">
+          <div class="directory-item active" data-index="0">01</div>
+          <div class="directory-item" data-index="1">02</div>
+          <div class="directory-item" data-index="2">03</div>
+          <div class="directory-item" data-index="3">04</div>
+          <div class="directory-item" data-index="4">05</div>
+          <div class="directory-item" data-index="5">06</div>
+          <div class="directory-item" data-index="6">07</div>
+          <div class="directory-item" data-index="7">08</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT SIDE: SIMULATION PANEL -->
+    <section class="display-panel">
+      <!-- Browser window mockup -->
+      <div class="mock-browser">
+        <div class="browser-header">
+          <div class="browser-dots">
+            <div class="browser-dot red"></div>
+            <div class="browser-dot yellow"></div>
+            <div class="browser-dot green"></div>
+          </div>
+          <div class="browser-address">
+            🔒 https://lee-1121.github.io/berryEyes/
+          </div>
+        </div>
+        
+        <div class="browser-content">
+          <!-- Local Canvas for confetti particle blast inside simulator -->
+          <canvas id="local-confetti-canvas"></canvas>
+
+          <!-- Interactive iOS frame mock -->
+          <div class="phone-simulator" id="phone-simulator">
+            <div class="simulator-notch"></div>
+            
+            <!-- PHONE APP CONTENT -->
+            <div class="simulator-screen" id="sim-screen">
+              
+              <!-- SCREEN 1: LOGIN -->
+              <div class="slide-screen active" id="sim-login">
+                <h1 class="screen-h1" style="margin-top: 40px; font-family: var(--font-fredoka); font-size: 1.7rem; color: var(--primary-dark);">BerryEyes</h1>
+                <div class="card" style="margin-top: 15px; text-align: center; padding: 18px 14px;">
+                  <div style="font-family: var(--font-serif); font-size: 1rem; color: var(--primary-dark); font-style: italic; margin-bottom: 4px;">Welcome ✧</div>
+                  <p style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 12px;">請輸入您的專屬暱稱開始記錄。<br>將同步至雲端，換手機也不遺失！</p>
+                  
+                  <div style="text-align: left; margin-bottom: 10px;">
+                    <label style="font-size: 0.58rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">您的專屬暱稱 / ID</label>
+                    <input type="text" id="sim-username-input" class="form-input" placeholder="例如：lulu99" value="" readonly>
+                  </div>
+                  <button class="submit-btn" id="sim-login-btn">開啟配戴記錄 💖</button>
+                </div>
+                
+                <div id="sim-sync-animation" class="sync-overlay" style="display: none;">
+                  <svg width="30" height="30" viewBox="0 0 100 100" style="animation: spin 1s linear infinite;">
+                    <path d="M 50,25 C 50,25 38,10 20,10 C 8,10 0,20 0,35 C 0,55 25,75 50,90 C 75,75 100,55 100,35 C 100,20 92,10 80,10 C 62,10 50,25 50,25 Z" fill="none" stroke="#FF6B8B" stroke-width="8"/>
+                  </svg>
+                  <span style="font-size: 0.7rem; font-weight: 600; color: var(--text-muted);">同步中...</span>
+                </div>
+              </div>
+
+              <!-- SCREEN 2: ACTIVE WEAR (HOME) -->
+              <div class="slide-screen" id="sim-home">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.65rem;">
+                  <span style="background: #FFE0E6; color: var(--primary-dark); padding: 2px 8px; border-radius: 10px; font-weight: 700;">👤 lulu99</span>
+                  <span style="color: var(--text-muted);">⚙️ 登出</span>
+                </div>
+                <h1 class="screen-h1" style="font-family: var(--font-fredoka);">BerryEyes</h1>
+                
+                <!-- Active Lens Status Card -->
+                <div class="card" id="sim-active-card">
+                  <div class="brand-tag">EverColor 🌸</div>
+                  <h3 style="font-family: var(--font-serif); font-size: 1.1rem; color: var(--primary-dark); margin-bottom: 6px;">甜酷粉 ✧ 心動日拋</h3>
+                  <div class="wear-progress-box">
+                    <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 600;">✦ 目前狀態 ✦</div>
+                    <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary-dark); margin: 4px 0;">🟢 配戴中 (日拋)</div>
+                    <div style="font-size: 0.72rem; color: var(--text-main); font-weight: 500;">今日已記錄配戴 🌸</div>
+                  </div>
+                </div>
+
+                <!-- Heart tracking button -->
+                <div class="heart-container">
+                  <div class="heart-button" id="sim-heart-btn">❤️</div>
+                </div>
+                <p style="font-size: 0.65rem; color: var(--text-muted); text-align: center;">點擊愛心記錄配戴，觸發粉白幸運亮片特效</p>
+              </div>
+
+              <!-- SCREEN 3: CONFETTI SPLASH (TRICK SCREEN FOR CONFETTI PREVIEW) -->
+              <div class="slide-screen" id="sim-confetti">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.65rem;">
+                  <span style="background: #FFE0E6; color: var(--primary-dark); padding: 2px 8px; border-radius: 10px; font-weight: 700;">👤 lulu99</span>
+                  <span style="color: var(--text-muted);">⚙️ 登出</span>
+                </div>
+                <h1 class="screen-h1" style="font-family: var(--font-fredoka);">BerryEyes</h1>
+                
+                <div class="card">
+                  <div class="brand-tag">EverColor 🌸</div>
+                  <h3 style="font-family: var(--font-serif); font-size: 1.1rem; color: var(--primary-dark); margin-bottom: 6px;">甜酷粉 ✧ 心動日拋</h3>
+                  <div class="wear-progress-box" style="background: #FFF0F2; border-color: var(--primary);">
+                    <div style="font-size: 0.65rem; color: var(--primary-dark); font-weight: bold;">🎉 今日配戴登錄成功！</div>
+                    <div style="font-size: 0.7rem; color: var(--text-main); margin-top: 4px;">累積配戴：第 3 天 (日拋)</div>
+                  </div>
+                </div>
+
+                <div class="heart-container">
+                  <div class="heart-button pulsing" id="sim-heart-btn-trigger">❤️</div>
+                </div>
+                <p style="font-size: 0.65rem; color: var(--primary-dark); font-weight: 700; text-align: center; animation: pulse textScale 1s infinite alternate;">✨ 亮片特效釋放中 ✨</p>
+              </div>
+
+              <!-- SCREEN 4: MY COLLECTION -->
+              <div class="slide-screen" id="sim-collection">
+                <h1 class="screen-h1">✧ 收藏款式 ✧</h1>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <span style="font-size: 0.7rem; font-weight: bold;">我的美瞳庫存 (3)</span>
+                  <button style="background: var(--primary-dark); border: none; border-radius: 10px; color: #FFFFFF; font-size: 0.62rem; padding: 4px 8px; font-weight: bold;" id="sim-add-lens-btn">➕ 新增款式</button>
+                </div>
+
+                <!-- Collection List Mock -->
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <div class="card" style="padding: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--primary);">
+                    <div>
+                      <span class="brand-tag">EverColor</span>
+                      <h4 style="font-size: 0.8rem; font-weight: bold;">甜酷粉 ✧ 心動日拋</h4>
+                    </div>
+                    <span style="font-size: 0.6rem; background: var(--primary-dark); color: #FFFFFF; padding: 2px 6px; border-radius: 8px; font-weight: bold;">配戴中</span>
+                  </div>
+
+                  <div class="card" style="padding: 10px; display: flex; justify-content: space-between; align-items: center; opacity: 0.8;">
+                    <div>
+                      <span class="brand-tag" style="background:#E1F5FE; color:#0288D1;">AQUAMAX</span>
+                      <h4 style="font-size: 0.8rem; font-weight: bold;">眼神系 ✧ 晨曦褐</h4>
+                    </div>
+                    <span style="font-size: 0.6rem; background: var(--text-muted); color: #FFFFFF; padding: 2px 6px; border-radius: 8px; font-weight: bold;">未啟用</span>
+                  </div>
+
+                  <div class="card" style="padding: 10px; display: flex; justify-content: space-between; align-items: center; opacity: 0.8;">
+                    <div>
+                      <span class="brand-tag" style="background:#E8F5E9; color:#2E7D32;">DOVIAN</span>
+                      <h4 style="font-size: 0.8rem; font-weight: bold;">多維氧 ✧ 自然灰</h4>
+                    </div>
+                    <span style="font-size: 0.6rem; background: var(--text-muted); color: #FFFFFF; padding: 2px 6px; border-radius: 8px; font-weight: bold;">未啟用</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SCREEN 5: CALENDAR TRACKING -->
+              <div class="slide-screen" id="sim-calendar">
+                <h1 class="screen-h1">✧ 配戴日曆 ✧</h1>
+                <div class="card" style="padding: 10px; margin-bottom: 8px;">
+                  <div style="font-size: 0.72rem; font-weight: bold; text-align: center; margin-bottom: 6px;">2026 年 5 月</div>
+                  
+                  <!-- Calendar structure -->
+                  <div class="sim-calendar-grid">
+                    <!-- Days header -->
+                    <div class="sim-cal-header">日</div><div class="sim-cal-header">一</div><div class="sim-cal-header">二</div><div class="sim-cal-header">三</div><div class="sim-cal-header">四</div><div class="sim-cal-header">五</div><div class="sim-cal-header">六</div>
+                    
+                    <!-- Month dates -->
+                    <div class="sim-cal-day empty"></div><div class="sim-cal-day empty"></div><div class="sim-cal-day empty"></div><div class="sim-cal-day empty"></div>
+                    <div class="sim-cal-day">1</div><div class="sim-cal-day">2</div><div class="sim-cal-day">3</div>
+                    <div class="sim-cal-day">4</div><div class="sim-cal-day">5</div><div class="sim-cal-day">6</div><div class="sim-cal-day">7</div><div class="sim-cal-day">8</div><div class="sim-cal-day">9</div><div class="sim-cal-day">10</div>
+                    <div class="sim-cal-day">11</div><div class="sim-cal-day">12</div><div class="sim-cal-day">13</div><div class="sim-cal-day">14</div><div class="sim-cal-day tracked">15</div><div class="sim-cal-day tracked">16</div><div class="sim-cal-day">17</div>
+                    <div class="sim-cal-day">18</div><div class="sim-cal-day">19</div><div class="sim-cal-day tracked">20</div><div class="sim-cal-day tracked">21</div><div class="sim-cal-day tracked">22</div><div class="sim-cal-day tracked">23</div><div class="sim-cal-day">24</div>
+                    <div class="sim-cal-day">25</div><div class="sim-cal-day">26</div><div class="sim-cal-day tracked selected" id="sim-cal-selected-day">27</div><div class="sim-cal-day">28</div><div class="sim-cal-day">29</div><div class="sim-cal-day">30</div><div class="sim-cal-day">31</div>
+                  </div>
+                </div>
+
+                <!-- Calendar Details Popup Box -->
+                <div class="card" style="padding: 10px; background: #FFF5F6; border-color: var(--primary);">
+                  <div style="font-size: 0.65rem; font-weight: bold; color: var(--primary-dark); display: flex; justify-content: space-between;">
+                    <span>📅 5 月 27 日 紀錄</span>
+                    <span>✨ 心動日拋</span>
+                  </div>
+                  <div style="font-size: 0.72rem; font-weight: 700; margin-top: 4px;">款式：EverColor - 甜酷粉</div>
+                  <div style="font-size: 0.6rem; color: var(--text-muted); margin-top: 2px;">配戴詳情：今日配戴登錄成功 (2026-05-27)</div>
+                </div>
+              </div>
+
+              <!-- SCREEN 6: CHACHA NEWS SCRAPER -->
+              <div class="slide-screen" id="sim-news">
+                <h1 class="screen-h1">✧ 最新美瞳情報 ✧</h1>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.6rem;">
+                  <span style="color: var(--text-muted); display: flex; align-items: center; gap: 3px;">🟢 Live 資料庫更新完成</span>
+                  <span style="background: var(--primary-light); color: var(--primary-dark); padding: 2px 6px; border-radius: 6px; font-weight: bold; cursor: pointer;">🔄 重新整理</span>
+                </div>
+
+                <!-- News Cards simulated -->
+                <div class="sim-news-card" id="sim-news-card-1">
+                  <div class="sim-news-img" style="background-image: url('threads_cherry_lens_1779269395478.png');"></div>
+                  <div class="sim-news-body">
+                    <span style="font-size: 0.58rem; color: var(--text-muted); font-weight: 700;">CHACHALOOK OFFICIAL</span>
+                    <h3 class="sim-news-title">多維氧 DOVIAN 新色上市 🌸</h3>
+                    <p class="sim-news-desc" id="sim-news-desc-text">
+                      大受歡迎的「自然光感系」矽水膠隱形眼鏡正式推出！全新「多維氧 DOVIAN」兼具透氧性與溫柔Y2K粉紅感，戴上即擁有神祕星塵閃耀感。
+                    </p>
+                    <div style="font-size: 0.58rem; color: var(--primary-dark); font-weight: bold; cursor: pointer; margin-top: 2px;" id="sim-news-toggle-btn">✨ 展開完整情報</div>
+                    
+                    <div style="display: flex; gap: 6px; margin-top: 8px; border-top: 1px dashed var(--border-color); padding-top: 6px;">
+                      <span style="flex: 1; text-align: center; font-size: 0.55rem; background: var(--primary-light); color: var(--primary-dark); padding: 4px 0; border-radius: 8px; font-weight: bold; cursor: pointer;">前往官網 🔗</span>
+                      <span style="flex: 1; text-align: center; font-size: 0.55rem; background: var(--primary-dark); color: #FFFFFF; padding: 4px 0; border-radius: 8px; font-weight: bold; cursor: pointer;" id="sim-news-quickadd-btn">快速加入款式 🌸</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SCREEN 7: AUTOFILL "QUICK ADD" (MODAL ACTIVE ON NEWS) -->
+              <div class="slide-screen" id="sim-quickadd">
+                <h1 class="screen-h1">✧ 最新美瞳情報 ✧</h1>
+                
+                <div class="sim-news-card" style="opacity: 0.4;">
+                  <div class="sim-news-img" style="background-image: url('threads_cherry_lens_1779269395478.png');"></div>
+                  <div class="sim-news-body">
+                    <h3 class="sim-news-title">多維氧 DOVIAN 新色上市 🌸</h3>
+                  </div>
+                </div>
+
+                <!-- Slide Up Modal simulation -->
+                <div class="sim-modal-overlay" id="sim-quickadd-modal" style="display: flex;">
+                  <div class="sim-modal-content">
+                    <div style="font-size: 0.72rem; font-weight: bold; text-align: center; margin-bottom: 10px; color: var(--primary-dark); font-family: var(--font-serif);">🌸 快速填寫美瞳款式 🌸</div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.65rem;">
+                      <div>
+                        <label style="font-weight: 700; color: var(--text-muted);">品牌名稱 (Brand)</label>
+                        <input type="text" id="sim-form-brand" class="form-input" style="padding: 6px; font-size: 0.72rem;" value="" readonly>
+                      </div>
+                      <div>
+                        <label style="font-weight: 700; color: var(--text-muted);">款式型號 (Model Name)</label>
+                        <input type="text" id="sim-form-name" class="form-input" style="padding: 6px; font-size: 0.72rem;" value="" readonly>
+                      </div>
+                      <button class="submit-btn" style="padding: 8px; font-size: 0.72rem; margin-top: 4px;">確認加入美瞳庫存 💖</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SCREEN 8: iOS PWA SETUP -->
+              <div class="slide-screen" id="sim-pwa">
+                <div style="text-align: center; padding: 10px 0;">
+                  <div style="font-size: 2.5rem; animation: pulse 1s infinite alternate;">📲</div>
+                  <h3 style="font-family: var(--font-serif); font-size: 0.95rem; color: var(--primary-dark); margin: 6px 0;">iOS 主畫面安裝教學</h3>
+                  <p style="font-size: 0.65rem; color: var(--text-main); line-height: 1.5; padding: 0 10px;">
+                    只要在 iPhone 上點選 Safari 的分享按鈕並將 BerryEyes 「加入主畫面」，即可獲得滿版無框的獨立 App 體驗！
+                  </p>
+                </div>
+                
+                <div class="card" style="padding: 10px; margin-top: 10px; text-align: center; background: #FFF5F6; border-color: var(--primary);">
+                  <div style="font-size: 0.6rem; color: var(--text-muted);">桌面上會自動生成這個可愛圖標</div>
+                  <div style="display: inline-block; width: 44px; height: 44px; border-radius: 12px; background: #FFFFFF; border: 1px solid var(--border-color); margin-top: 6px; box-shadow: 0 4px 8px var(--shadow-color); padding: 4px;">
+                    <img src="threads_cherry_lens_1779269395478.png" style="width: 100%; height: 100%; object-fit: contain;">
+                  </div>
+                  <div style="font-size: 0.62rem; font-weight: bold; color: var(--primary-dark); margin-top: 2px;">BerryEyes</div>
+                </div>
+
+                <!-- Simulated Share Sheet popup -->
+                <div class="safari-sharesheet" id="sim-safari-sharesheet">
+                  <div class="sharesheet-header">BerryEyes 隱形眼鏡小幫手</div>
+                  <div class="sharesheet-options">
+                    <div class="sharesheet-opt">
+                      <span>加入書籤</span>
+                      <span>⭐️</span>
+                    </div>
+                    <div class="sharesheet-opt" id="sim-sharesheet-pwa-opt" style="border: 2px solid var(--primary); background: var(--phone-bg);">
+                      <span style="font-weight: bold; color: var(--primary-dark);">➕ 加入主畫面</span>
+                      <span>📱</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- SIMULATOR NAVIGATION TAB BAR (MATCHING BERRYEYES TABS) -->
+            <div class="simulator-navbar">
+              <div class="sim-nav-tab active" id="sim-tab-home">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>首頁</span>
+              </div>
+              <div class="sim-nav-tab" id="sim-tab-collection">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <span>款式</span>
+              </div>
+              <div class="sim-nav-tab" id="sim-tab-calendar">
+                <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+                <span>日曆</span>
+              </div>
+              <div class="sim-nav-tab" id="sim-tab-news">
+                <svg viewBox="0 0 24 24"><path d="M19 3h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14c0-1.1-.9-2-2-2zm-1 16h-12v-2h12v2zm0-4h-12v-2h12v2zm0-4h-12v-4h12v4z"/></svg>
+                <span>情報</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- OVERLAY ANNOTATIONS (ARROWS, RINGS, CURSORS) -->
+          <div class="overlay-layer">
+            <div class="pulse-ring" id="pulse-target"></div>
+            
+            <svg class="bouncing-arrow" id="visual-arrow" viewBox="0 0 24 24" fill="var(--primary-dark)">
+              <!-- Beautiful pink arrow path pointing down -->
+              <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/>
+            </svg>
+            
+            <div class="bubble-annotation" id="bubble-callout">這是註解說明</div>
+            
+            <div class="virtual-cursor" id="fake-cursor"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       ✦ JAVASCRIPT ANIMATION LOOP & STORYBOARD ENGINE
+       ============================================================ */ -->
+  <script>
+    // Slide Data Store
+    const slides = [
+      {
+        title: "登入與雲端同步",
+        desc: `<ul>
+                <li>使用者首次開啟網頁，只要輸入專屬的暱稱或個人 ID 即可快速登入。</li>
+                <li>登入時會即時串接 Supabase 雲端資料庫。若之前已有紀錄，程式會自動從雲端完成雙向同步。</li>
+                <li>如果雲端連線失敗或無資料，會自動無縫切換至本地快取（Local Storage）備份，保證在各種環境下都能完美操作。</li>
+               </ul>`,
+        setup: function() {
+          setSimulatorScreen("sim-login", "sim-tab-home");
+          resetSimulatorAnimations();
+          
+          const cursor = document.getElementById("fake-cursor");
+          const input = document.getElementById("sim-username-input");
+          const loginBtn = document.getElementById("sim-login-btn");
+          const syncAnim = document.getElementById("sim-sync-animation");
+          
+          input.value = "";
+          syncAnim.style.display = "none";
+          
+          // Animate mouse pointer typing user nickname and clicking login
+          setTimeout(() => {
+            moveCursorTo(input, () => {
+              typeIntoInput(input, "lulu99", () => {
+                setTimeout(() => {
+                  moveCursorTo(loginBtn, () => {
+                    // Highlight click
+                    showPulseRing(loginBtn);
+                    loginBtn.style.transform = "scale(0.95)";
+                    setTimeout(() => { loginBtn.style.transform = "scale(1)"; }, 150);
+                    
+                    // Show synchronizing loading wheel
+                    syncAnim.style.display = "flex";
+                    showBubble(loginBtn, "即時與 Supabase 雲端伺服器進行同步...", "bottom");
+                  });
+                }, 500);
+              });
+            });
+          }, 800);
+        }
+      },
+      {
+        title: "主畫面配戴狀態追蹤",
+        desc: `<ul>
+                <li>首頁以精緻的 Y2K 少女粉色馬卡龍風格呈現。</li>
+                <li>會動態判定與顯示目前正在配戴的隱形眼鏡狀態，包含「品牌、款式型號、配戴狀態、已配戴天數」。</li>
+                <li>提醒使用者目前隱眼是否已達到建議更換期限（例如：日拋、月拋建議天數），維護雙眼健康。</li>
+               </ul>`,
+        setup: function() {
+          setSimulatorScreen("sim-home", "sim-tab-home");
+          resetSimulatorAnimations();
+          
+          const activeCard = document.getElementById("sim-active-card");
+          
+          setTimeout(() => {
+            showPulseRing(activeCard);
+            showArrowAbove(activeCard);
+            showBubble(activeCard, "動態讀取並判定您目前的美瞳配戴狀態與剩餘天數！", "bottom");
+          }, 800);
+        }
+      },
+      {
+        title: "點擊配戴紀錄與亮片特效",
+        desc: `<ul>
+                <li>只要點擊畫面中央大大的 ❤️ 顆心按鈕，即可輕鬆登記今天已戴上隱眼。</li>
+                <li>為了豐富使用者體驗，當成功紀錄時，系統會立刻觸發 **Y2K 雙色粉色與純白亮片粒子特效**，在螢幕中央向四周擴散噴發！</li>
+                <li>這個特效會帶有彈跳與微幅重力感，帶給使用者每日記錄美甲美瞳的滿滿生活儀式感。</li>
+               </ul>`,
+        setup: function() {
+          setSimulatorScreen("sim-home", "sim-tab-home");
+          resetSimulatorAnimations();
+          
+          const heartBtn = document.getElementById("sim-heart-btn");
+          
+          setTimeout(() => {
+            moveCursorTo(heartBtn, () => {
+              // Click heart
+              showPulseRing(heartBtn);
+              heartBtn.classList.add("pulsing");
+              
+              // Trigger actual canvas-confetti particle blast!
+              triggerSimulatorConfetti();
+              
+              // Switch mockup view to screen-confetti to show "success logged!"
+              setTimeout(() => {
+                setSimulatorScreen("sim-confetti", "sim-tab-home");
+                const heartTrigger = document.getElementById("sim-heart-btn-trigger");
+                showBubble(heartTrigger, "點擊 ❤️ 觸發特製 Y2K 粉白亮片噴發！", "top");
+              }, 400);
+            });
+          }, 800);
+        }
+      },
+      {
+        title: "款式收藏清單",
+        desc: `<ul>
+                <li>點擊下方導覽列的「款式」圖示進入美瞳收藏庫。</li>
+                <li>條列顯示所有已買的美瞳庫存。每張款式卡片有著精巧的品牌色塊標籤（如 EverColor、AQUAMAX）。</li>
+                <li>卡片右下角會顯示當前款式狀態：「配戴中」的卡片會亮起桃紅底色，其他未啟用的款式卡片則呈灰色。</li>
+                <li>右上方設有「新增款式」按鈕，方便您擴充自己的美瞳抽屜。</li>
+               </ul>`,
+        setup: function() {
+          setSimulatorScreen("sim-collection", "sim-tab-collection");
+          resetSimulatorAnimations();
+          
+          const navTab = document.getElementById("sim-tab-collection");
+          const addBtn = document.getElementById("sim-add-lens-btn");
+          
+          setTimeout(() => {
+            showPulseRing(navTab);
+            setTimeout(() => {
+              showPulseRing(addBtn);
+              showArrowAbove(addBtn);
+              showBubble(addBtn, "款式清單清楚分類「配戴中」與「未啟用」的庫存美瞳！", "bottom");
+            }, 600);
+          }, 600);
+        }
+      },
+      {
+        title: "配戴日曆歷史紀錄",
+        desc: `<ul>
+                <li>點選下方導覽列的「日曆」進入追蹤歷史畫面。</li>
+                <li>日曆上，**曾經配戴記錄的日期會亮起淡粉色的圓框標記**，讓您對過去每個月的隱形眼鏡消耗與配戴狀況一目了然。</li>
+                <li>隨意點擊日曆上的任何有紀錄日期，下方會立刻彈出該天的**詳細配戴日誌卡片**，顯示該天戴了哪款美瞳，非常直覺！</li>
+               </ul>`,
+        setup: function() {
+          setSimulatorScreen("sim-calendar", "sim-tab-calendar");
+          resetSimulatorAnimations();
+          
+          const selectedDay = document.getElementById("sim-cal-selected-day");
+          
+          setTimeout(() => {
+            moveCursorTo(selectedDay, () => {
+              showPulseRing(selectedDay);
+              selectedDay.classList.add("selected");
+              showArrowAbove(selectedDay);
+              showBubble(selectedDay, "點選粉紅色標記日期，下方自動顯示當日詳細戴過的美瞳日誌！", "bottom");
+            });
+          }, 800);
+        }
+      },
+      {
+        title: "即時美瞳情報與折疊卡片",
+        desc: `<ul>
+                <li>美瞳情報畫面會動態向開源台灣彩瞳分享網站（Chachalook）發送動態 Live 爬蟲請求，免除人工更新情報的麻煩。</li>
+                <li>**折疊手風琴卡片設計**：由於促銷描述文字普遍偏長，我們將卡片預設折疊，尾端附帶白色漸層淡出。點擊 ` + "`展开`" + ` 自動展開全段文字，並將按鈕變為 ` + "`收合`" + `。</li>
+                <li>卡片下方並列「前往官網」連結，與「快速加入款式」捷徑按鈕。</li>
+               </ul>`,
+        setup: function() {
+          setSimulatorScreen("sim-news", "sim-tab-news");
+          resetSimulatorAnimations();
+          
+          const toggleBtn = document.getElementById("sim-news-toggle-btn");
+          const descText = document.getElementById("sim-news-desc-text");
+          
+          setTimeout(() => {
+            moveCursorTo(toggleBtn, () => {
+              showPulseRing(toggleBtn);
+              toggleBtn.innerHTML = "✦ 收合";
+              descText.classList.add("expanded");
+              showArrowAbove(toggleBtn);
+              showBubble(toggleBtn, "手風琴特效折疊超長情報！點擊展開或收合資訊。", "top");
+            });
+          }, 800);
+        }
+      },
+      {
+        title: "一鍵快速填寫與自動帶入",
+        desc: `<ul>
+                <li>在最新情報中看到心儀款式？點選卡片上的 **「快速加入款式 🌸」**。</li>
+                <li>系統會自動啟動 **NLP 智慧解析器**，將卡片標題（如「多維氧 DOVIAN」）自動拆解並提取出品牌「DOVIAN」與型號「多維氧」。</li>
+                <li>自動彈出「新增款式」對話框，且**表單輸入框內已經幫您自動填寫好品牌與型號**！免除重複手動輸入的疲勞。</li>
+               </ul>`,
+        setup: function() {
+          setSimulatorScreen("sim-news", "sim-tab-news");
+          resetSimulatorAnimations();
+          
+          const quickAddBtn = document.getElementById("sim-news-quickadd-btn");
+          const fakeBrand = document.getElementById("sim-form-brand");
+          const fakeName = document.getElementById("sim-form-name");
+          
+          setTimeout(() => {
+            moveCursorTo(quickAddBtn, () => {
+              showPulseRing(quickAddBtn);
+              
+              setTimeout(() => {
+                // Switch screen to sim-quickadd showing the slide up form
+                setSimulatorScreen("sim-quickadd", "sim-tab-news");
+                
+                // Animate typing autofilled fields
+                setTimeout(() => {
+                  typeIntoInput(fakeBrand, "DOVIAN", () => {
+                    setTimeout(() => {
+                      typeIntoInput(fakeName, "多維氧", () => {
+                        showPulseRing(fakeName);
+                        showArrowAbove(fakeName);
+                        showBubble(fakeName, "表單已為您自動拆解、填寫好品牌與型號！點擊確認即可直接存檔。", "top");
+                      });
+                    }, 400);
+                  });
+                }, 400);
+                
+              }, 300);
+            });
+          }, 800);
+        }
+      },
+      {
+        title: "iOS PWA 全螢幕獨立 App 體驗",
+        desc: `<ul>
+                <li>為了讓大家的手機 iOS 瀏覽時體驗更完美，我們為頁面整合了 iOS WebApp 規範。</li>
+                <li>用 Safari 開啟並將本網頁 **「加入主畫面」**，它就會如同真正的 App 般渲染。</li>
+                <li>點擊主畫面圖案啟動時，會自動隱藏頂部網址列與底部瀏覽器底欄，真正做到**全螢幕、無邊框的沉浸式操作**！</li>
+               </ul>`,
+        setup: function() {
+          setSimulatorScreen("sim-pwa", "sim-tab-news");
+          resetSimulatorAnimations();
+          
+          const shareSheet = document.getElementById("sim-safari-sharesheet");
+          const sharesheetOpt = document.getElementById("sim-sharesheet-pwa-opt");
+          
+          setTimeout(() => {
+            // Zoom the simulator for detail view
+            document.getElementById("phone-simulator").classList.add("zoomed");
+            
+            // Pop up share sheet mockup
+            shareSheet.style.display = "block";
+            
+            setTimeout(() => {
+              showPulseRing(sharesheetOpt);
+              showArrowAbove(sharesheetOpt);
+              showBubble(sharesheetOpt, "在 Safari 點選分享並選擇「加入主畫面」，即可下載為全螢幕 App！", "top");
+            }, 600);
+          }, 800);
+        }
+      }
+    ];
+
+    // Page State variables
+    let currentSlide = 0;
+    let autoplayTimer = null;
+    let isAutoplayPlaying = false;
+    const AUTOPLAY_SLIDE_DURATION = 6500; // 6.5s per slide to allow cursor animations to complete
+
+    // Element bindings
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const autoplayTrigger = document.getElementById("autoplay-trigger");
+    const autoplayText = document.getElementById("autoplay-text");
+    const playIcon = document.getElementById("play-icon");
+    const slideNumBadge = document.getElementById("slide-num-badge");
+    const slideTitleDisplay = document.getElementById("slide-title-display");
+    const slideDescDisplay = document.getElementById("slide-desc-display");
+    
+    // Annotation overlays elements
+    const pulseTarget = document.getElementById("pulse-target");
+    const visualArrow = document.getElementById("visual-arrow");
+    const bubbleCallout = document.getElementById("bubble-callout");
+    const fakeCursor = document.getElementById("fake-cursor");
+
+    // Initialize Page
+    document.addEventListener("DOMContentLoaded", () => {
+      // Set initial slide
+      goToSlide(0);
+      
+      // Nav Click Listeners
+      prevBtn.addEventListener("click", () => {
+        if (isAutoplayPlaying) toggleAutoplay();
+        goToSlide(currentSlide - 1);
+      });
+      nextBtn.addEventListener("click", () => {
+        if (isAutoplayPlaying) toggleAutoplay();
+        goToSlide(currentSlide + 1);
+      });
+      
+      // Directory Click Listeners
+      document.querySelectorAll(".directory-item").forEach(item => {
+        item.addEventListener("click", () => {
+          if (isAutoplayPlaying) toggleAutoplay();
+          const targetIndex = parseInt(item.getAttribute("data-index"));
+          goToSlide(targetIndex);
+        });
+      });
+
+      // Autoplay Trigger Listener
+      autoplayTrigger.addEventListener("click", toggleAutoplay);
+    });
+
+    // Go to specific slide index
+    function goToSlide(index) {
+      if (index < 0 || index >= slides.length) return;
+      currentSlide = index;
+      
+      // Update Active Navigation States
+      prevBtn.disabled = (currentSlide === 0);
+      nextBtn.disabled = (currentSlide === slides.length - 1);
+      
+      document.querySelectorAll(".directory-item").forEach((item, idx) => {
+        item.classList.toggle("active", idx === currentSlide);
+      });
+      
+      // Update Left Side Info Content
+      slideNumBadge.innerHTML = `Step 0${currentSlide + 1} / 0${slides.length}`;
+      slideTitleDisplay.innerHTML = slides[currentSlide].title;
+      slideDescDisplay.innerHTML = slides[currentSlide].desc;
+      
+      // Reset simulator zoom/notch styles if shifting out of Slide 8
+      if (currentSlide !== 7) {
+        document.getElementById("phone-simulator").classList.remove("zoomed");
+      }
+      
+      // Run specific slide setup functions (Cursor / Pointers animations)
+      slides[currentSlide].setup();
+    }
+
+    // Toggle autoplay status
+    function toggleAutoplay() {
+      if (isAutoplayPlaying) {
+        // Pause
+        isAutoplayPlaying = false;
+        clearInterval(autoplayTimer);
+        autoplayText.innerText = "▶️ 開始自動播放介紹";
+        autoplayTrigger.classList.remove("playing");
+        playIcon.innerHTML = `<path d="M8 5v14l11-7z"/>`;
+      } else {
+        // Play
+        isAutoplayPlaying = true;
+        autoplayText.innerText = "⏸ 暫停自動播放";
+        autoplayTrigger.classList.add("playing");
+        playIcon.innerHTML = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
+        
+        // Loop timeline
+        autoplayTimer = setInterval(() => {
+          if (currentSlide < slides.length - 1) {
+            goToSlide(currentSlide + 1);
+          } else {
+            // Loop back to start
+            goToSlide(0);
+          }
+        }, AUTOPLAY_SLIDE_DURATION);
+      }
+    }
+
+    // ============================================================
+    // ✦ SIMULATOR ENGINE UTILITIES
+    // ============================================================
+    
+    function setSimulatorScreen(screenId, activeTabId) {
+      // Toggle views
+      document.querySelectorAll(".slide-screen").forEach(screen => {
+        screen.classList.remove("active");
+      });
+      document.getElementById(screenId).classList.add("active");
+      
+      // Toggle navbar tabs active state
+      document.querySelectorAll(".sim-nav-tab").forEach(tab => {
+        tab.classList.remove("active");
+      });
+      if (activeTabId) {
+        document.getElementById(activeTabId).classList.add("active");
+      }
+    }
+
+    function resetSimulatorAnimations() {
+      // Clear timers, hides markers, reset cursors
+      pulseTarget.style.display = "none";
+      visualArrow.style.display = "none";
+      bubbleCallout.style.display = "none";
+      bubbleCallout.classList.remove("active");
+      
+      fakeCursor.style.display = "none";
+      fakeCursor.style.transition = "none";
+      fakeCursor.style.transform = "translate(0,0)";
+      
+      // Clean classes
+      document.getElementById("sim-heart-btn").classList.remove("pulsing");
+      document.getElementById("sim-heart-btn-trigger").classList.remove("pulsing");
+      document.getElementById("sim-news-desc-text").classList.remove("expanded");
+      document.getElementById("sim-news-toggle-btn").innerHTML = "✨ 展開完整情報";
+      document.getElementById("sim-form-brand").value = "";
+      document.getElementById("sim-form-name").value = "";
+      document.getElementById("sim-safari-sharesheet").style.display = "none";
+      document.getElementById("sim-cal-selected-day").classList.remove("selected");
+    }
+
+    // Animate mouse cursor movements
+    function moveCursorTo(targetElement, onComplete) {
+      if (!targetElement) return;
+      
+      const contentBox = document.querySelector(".browser-content");
+      const cursor = document.getElementById("fake-cursor");
+      
+      const targetRect = targetElement.getBoundingClientRect();
+      const contentRect = contentBox.getBoundingClientRect();
+      
+      // Calculate target position relative to simulator background container
+      const targetX = targetRect.left - contentRect.left + (targetRect.width / 2);
+      const targetY = targetRect.top - contentRect.top + (targetRect.height / 2);
+      
+      // Initial Position (Start at bottom right corner)
+      cursor.style.transition = "none";
+      cursor.style.left = "80%";
+      cursor.style.top = "90%";
+      cursor.style.display = "block";
+      
+      // Force repaint
+      cursor.offsetHeight;
+      
+      // Move to target with transition
+      cursor.style.transition = "all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+      cursor.style.left = `${targetX}px`;
+      cursor.style.top = `${targetY}px`;
+      
+      setTimeout(onComplete, 950);
+    }
+
+    // Auto-typing simulator
+    function typeIntoInput(inputElement, textString, onComplete) {
+      let index = 0;
+      inputElement.value = "";
+      
+      function typeChar() {
+        if (index < textString.length) {
+          inputElement.value += textString.charAt(index);
+          index++;
+          setTimeout(typeChar, 80);
+        } else {
+          if (onComplete) onComplete();
+        }
+      }
+      typeChar();
+    }
+
+    // Show visual annotation pointer ring
+    function showPulseRing(targetElement) {
+      if (!targetElement) return;
+      const contentBox = document.querySelector(".browser-content");
+      const targetRect = targetElement.getBoundingClientRect();
+      const contentRect = contentBox.getBoundingClientRect();
+      
+      const targetX = targetRect.left - contentRect.left + (targetRect.width / 2);
+      const targetY = targetRect.top - contentRect.top + (targetRect.height / 2);
+      
+      pulseTarget.style.left = `${targetX}px`;
+      pulseTarget.style.top = `${targetY}px`;
+      pulseTarget.style.display = "block";
+    }
+
+    // Show visual arrow pointer pointing to target
+    function showArrowAbove(targetElement) {
+      if (!targetElement) return;
+      const contentBox = document.querySelector(".browser-content");
+      const targetRect = targetElement.getBoundingClientRect();
+      const contentRect = contentBox.getBoundingClientRect();
+      
+      const targetX = targetRect.left - contentRect.left + (targetRect.width / 2);
+      const targetY = targetRect.top - contentRect.top - 8; // Offset above target
+      
+      visualArrow.style.left = `${targetX}px`;
+      visualArrow.style.top = `${targetY}px`;
+      visualArrow.style.display = "block";
+    }
+
+    // Show text tooltip annotation balloon
+    function showBubble(targetElement, textMsg, position = "top") {
+      if (!targetElement) return;
+      const contentBox = document.querySelector(".browser-content");
+      const targetRect = targetElement.getBoundingClientRect();
+      const contentRect = contentBox.getBoundingClientRect();
+      
+      const targetX = targetRect.left - contentRect.left + (targetRect.width / 2);
+      let targetY = targetRect.top - contentRect.top - 12;
+      
+      if (position === "bottom") {
+        targetY = targetRect.bottom - contentRect.top + 36;
+        bubbleCallout.style.setProperty("--arrow-direction", "rotate(180deg)");
+      }
+      
+      bubbleCallout.innerHTML = textMsg;
+      bubbleCallout.style.left = `${targetX}px`;
+      bubbleCallout.style.top = `${targetY}px`;
+      bubbleCallout.style.display = "block";
+      
+      // Trigger animations
+      setTimeout(() => {
+        bubbleCallout.classList.add("active");
+      }, 50);
+    }
+
+    // Trigger local canvas confetti blast
+    function triggerSimulatorConfetti() {
+      const canvas = document.getElementById("local-confetti-canvas");
+      const myConfetti = confetti.create(canvas, { resize: true });
+      
+      // Blast two streams of Y2K confetti (light pink, dark pink, white)
+      const colors = ['#FFD1DC', '#FF85A2', '#FFFFFF'];
+      
+      myConfetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.55, x: 0.5 },
+        colors: colors,
+        scalar: 0.8
+      });
+    }
+  </script>
+</body>
+</html>
